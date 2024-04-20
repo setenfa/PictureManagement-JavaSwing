@@ -61,7 +61,6 @@ public class CustomFlowLayout extends FlowLayout {
                 if (m.isVisible()) {
                     Dimension d = m.getPreferredSize();
 
-                    // Reset x to 0 (left alignment) if this component is the first in a row
                     if ((x == 0) || ((x + d.width) > maxwidth)) {
                         if (i > 0) {
                             y += vgap + rowh;
@@ -70,7 +69,6 @@ public class CustomFlowLayout extends FlowLayout {
                         rowh = d.height;
                     }
 
-                    // Set component's bounds
                     m.setBounds(x, y, d.width, d.height);
 
                     x += d.width + hgap;

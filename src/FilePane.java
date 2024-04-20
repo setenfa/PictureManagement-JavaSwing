@@ -6,15 +6,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-public class FilePano {
+public class FilePane {
     public JPanel panel1;
     private JTree tree;
     private ImageDisplay imageDisplay;
 
-    public FilePano() {
+    public FilePane() {
         imageDisplay = new ImageDisplay();
         panel1 = new JPanel(new BorderLayout()); // 修改布局管理器为BorderLayout
-        // 获取系统的根目录
+        // 获取系统的根目录(暂时用C:/Users代替)
         File rootFile = new File("C:/Users");
         // 遍历根目录，获得目录树
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootFile);
@@ -31,6 +31,7 @@ public class FilePano {
                 return this;
             }
         });
+        // 设置树的监听器，使其能够双击文件夹时显示文件夹中的图片
         tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -68,6 +69,7 @@ public class FilePano {
             }
         }
     }
+    // 用于返回ImageDisplay对象，以便在MAIN类中添加到JFrame中
     public ImageDisplay getImageDisplay() {
         return imageDisplay;
     }
