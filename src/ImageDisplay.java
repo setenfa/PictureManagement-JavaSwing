@@ -69,10 +69,29 @@ public class ImageDisplay {
                 panel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        if (panel.getBorder() != null) {
-                            panel.setBorder(null);
-                        } else {
-                            panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        // 检查是否按下了Ctrl键和鼠标左键
+                        if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON1) {
+                            // 如果按下了Ctrl键和鼠标左键，检查面板是否已经被选中
+                            if (panel.getBorder() != null) {
+                                // 如果面板已经被选中，取消选中
+                                panel.setBorder(null);
+                            } else {
+                                // 如果面板没有被选中，选中面板
+                                panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                            }
+                        } else if (e.getButton() == MouseEvent.BUTTON1) {
+                            // 如果没有按下Ctrl键或鼠标左键，将所有面板的边框设为null，然后只为被点击的面板设置边框
+                            for(JPanel smallPanel : smallPanels) {
+                                smallPanel.setBorder(null);
+                            }
+                            // 检查面板是否已经被选中
+                            if (panel.getBorder() != null) {
+                                // 如果面板已经被选中，取消选中
+                                panel.setBorder(null);
+                            } else {
+                                // 如果面板没有被选中，选中面板
+                                panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                            }
                         }
                     }
                 });
@@ -83,7 +102,7 @@ public class ImageDisplay {
             }
         }
         // 将小面板添加到主面板，如果没有则显示没有图片
-        if (smallPanels.size() > 0) {
+        if (!smallPanels.isEmpty()) {
             for (JPanel smallPanel : smallPanels) {
                 imagePanel.add(smallPanel);
                 numOfImages++;
@@ -100,9 +119,5 @@ public class ImageDisplay {
 
     public JScrollPane getScrollPane() {
         return scrollPane;
-    }
-
-    public int getNumOfImages() {
-        return numOfImages;
     }
 }

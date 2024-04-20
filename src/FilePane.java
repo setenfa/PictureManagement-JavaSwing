@@ -5,13 +5,16 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 public class FilePane {
     public JPanel panel1;
     private JTree tree;
     private ImageDisplay imageDisplay;
-
+    // 创建一个线程池，用于遍历文件夹
+    private final ExecutorService executorService;
     public FilePane() {
+        this.executorService = Executors.newFixedThreadPool(10);
         imageDisplay = new ImageDisplay();
         panel1 = new JPanel(new BorderLayout()); // 修改布局管理器为BorderLayout
         // 获取系统的根目录(暂时用C:/Users代替)
@@ -65,7 +68,8 @@ public class FilePane {
             if (f.isDirectory()) {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(f);
                 root.add(node);
-                addNodes(node, f);
+                // 递归调用，遍历文件夹
+                executorService.submit(() -> addNodes(node, f));
             }
         }
     }
