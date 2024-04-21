@@ -46,12 +46,15 @@ public class FilePane {
                     File file = (File) node.getUserObject();
                     if (file.isDirectory()) {
                         File[] files = file.listFiles();
-                        imageDisplay.addImageOnPane(files);
+                        // 获取文件夹名称和图片
+                        String folderName = file.getName();
+                        imageDisplay.addImageOnPane(files, folderName);
                     }
                 }
             }
         });
         JScrollPane scrollPane = new JScrollPane(tree); // 将JTree添加到JScrollPane中
+        scrollPane.setPreferredSize(new Dimension(200, 600));
         panel1.add(scrollPane, BorderLayout.CENTER); // 将JScrollPane添加到JPanel中
 
     }
