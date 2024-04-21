@@ -11,11 +11,13 @@ public class FilePane {
     public JPanel panel1;
     private JTree tree;
     private ImageDisplay imageDisplay;
+    private ImageMenuItem imageMenuItem;
     // 创建一个线程池，用于遍历文件夹
     private final ExecutorService executorService;
     public FilePane() {
         this.executorService = Executors.newFixedThreadPool(10);
         imageDisplay = new ImageDisplay();
+        imageMenuItem = new ImageMenuItem(imageDisplay);
         panel1 = new JPanel(new BorderLayout()); // 修改布局管理器为BorderLayout
         // 获取系统的根目录(暂时用C:/Users代替)
         File rootFile = new File("C:/Users");
