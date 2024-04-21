@@ -1,3 +1,5 @@
+package ui;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -18,7 +20,7 @@ public class ImageDisplay {
 
     public ImageDisplay() {
         imagePanel = new JPanel();
-        imagePanel.setLayout(new CustomFlowLayout(5));
+        //imagePanel.setLayout(new CustomFlowLayout(5));
         scrollPane = new JScrollPane(imagePanel);
         scrollPane.setPreferredSize(new Dimension(800, 600));
 

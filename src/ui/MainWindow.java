@@ -1,11 +1,12 @@
+package ui;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
 
-import ui.Button;
+import util.ui.Button;
+import util.ui.MyLayoutManager;
 
 public class MainWindow {
 
@@ -17,15 +18,15 @@ public class MainWindow {
 
     public MainWindow(FilePane fileNode, int width, int height) {
         this.fileNode = fileNode;
-        initialPathBar(width);
-        initialMainPanel(width, height);
-        initialMainWindow(width, height);
         this.fileNode.getImageDisplay().getScrollPane().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 updatePath();
             }
         });
+        initialPathBar(width);
+        initialMainPanel(width, height);
+        initialMainWindow(width, height);
     }
 
     private void initialMainWindow(int width, int height) {
@@ -39,16 +40,18 @@ public class MainWindow {
 
     private void initialMainPanel(int width, int height) {
         this.main = new JPanel(new MainWindowLayout());
-        this.main.setBounds(0, 0, width, height);
-        this.main.add(this.fileNode.panel1);
-        this.main.add(this.fileNode.getImageDisplay().getScrollPane());
+        this.main.setSize(width, height);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.fileNode.panel1, this.fileNode.getImageDisplay().getScrollPane());
+        splitPane.setDividerLocation((int) (width * 0.3));
+        splitPane.setDividerSize(2);
+        this.main.add(splitPane);
         this.main.add(this.pathBar);
     }
 
     // 初始化路径栏
     private void initialPathBar(int width) {
         this.pathBar = new JPanel();
-        this.pathBar.setBounds(0, 0, width, 50);
+        this.pathBar.setSize(width, 50);
         this.pathBar.setBackground(Color.WHITE);
         this.pathBar.setLayout(null);
         JTextField path = new JTextField(fileNode.getCurrentFile().getPath());
@@ -58,7 +61,20 @@ public class MainWindow {
         Button button1 = new Button("后退", 24, 24);
         Button button2 = new Button("前进", 24, 24);
         Button button3 = new Button("上一级", 24, 24);
-        Button button4 = new Button("前往", 24, 24);
+        Button button4 = new Button("前往", 24, 24) {
+            @Override
+            public void todo() {
+                if (!fileNode.updateTree(path.getText())) {
+                    updatePath();
+                }
+                for(Component comp : main.getComponents()) {
+                    if(comp instanceof JSplitPane) {
+                        comp.revalidate();
+                        comp.repaint();
+                    }
+                }
+            }
+        };
         this.pathBar.add(button1);
         this.pathBar.add(button2);
         this.pathBar.add(button3);
@@ -85,11 +101,8 @@ public class MainWindow {
         public void layoutContainer(Container parent) {
             Component[] components = parent.getComponents();
             for (Component component : components) {
-                if (component.equals(fileNode.panel1)) {
-                    component.setBounds(component.getX(), component.getY(), component.getWidth(), main.getHeight() - pathBar.getHeight());
-                } else if (component.equals(fileNode.getImageDisplay().getScrollPane())) {
-                    component.setBounds(component.getX(), component.getY(), main.getWidth() - fileNode.panel1.getWidth(), main.getHeight() - pathBar.getHeight());
-                } else if (component.equals(pathBar)) {
+                if (component.equals(pathBar)) {
+                    pathBar.setSize(main.getWidth(), pathBar.getHeight());
                     Component[] pathBarComponents = pathBar.getComponents();
                     int width = 4;
                     int height = 4;
@@ -111,7 +124,10 @@ public class MainWindow {
                         }
 
                     }
-                    component.setBounds(0, 0, main.getWidth(), 50);
+                    component.setBounds(0, 0, pathBar.getWidth(), pathBar.getHeight());
+                }
+                else if (component instanceof JSplitPane) {
+                    component.setBounds(-1, pathBar.getHeight(), main.getWidth() + 4, main.getHeight() - pathBar.getHeight() + 3);
                 }
             }
         }
@@ -119,15 +135,11 @@ public class MainWindow {
         @Override
         public void addLayoutComponent(Component comp, Object constraints) {
             super.addLayoutComponent(comp, constraints);
-            if (comp.equals(fileNode.panel1)) {
-                comp.setBounds(0, 50, (int) (main.getWidth() * 0.3), main.getHeight() - pathBar.getHeight());
-            }
-            if (comp.equals(fileNode.getImageDisplay().getScrollPane())) {
-                comp.setBounds((int) (main.getWidth() * 0.3 + 2), 50, (int) (main.getWidth() * 0.7), main.getHeight() - pathBar.getHeight());
-                comp.setPreferredSize(new Dimension((int) (main.getWidth() * 0.7), main.getHeight()));
-            }
             if (comp.equals(pathBar)) {
-                comp.setBounds(0, 0, main.getWidth(), 50);
+                comp.setBounds(0, 0, pathBar.getWidth(), pathBar.getHeight());
+            }
+            if (comp instanceof JSplitPane) {
+                comp.setBounds(-1, pathBar.getHeight(), main.getWidth() + 4, main.getHeight() - pathBar.getHeight() + 3);
             }
         }
     }
