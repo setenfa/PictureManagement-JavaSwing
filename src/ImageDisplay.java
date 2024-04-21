@@ -151,7 +151,6 @@ public class ImageDisplay {
                 smallPanels.add(panel);
             }
         }
-        bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
         // 将小面板添加到主面板，如果没有则显示没有图片
         if (!smallPanels.isEmpty()) {
             for (JPanel smallPanel : smallPanels) {
@@ -163,6 +162,7 @@ public class ImageDisplay {
             imagePanel.add(label);
         }
         numOfImagesLabel.setText("图片数量：" + numOfImages);
+        bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
         // 用于动态添加或删除组件后更新面板布局和刷新显示
         imagePanel.revalidate();
         imagePanel.repaint();
