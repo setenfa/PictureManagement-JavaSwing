@@ -40,7 +40,7 @@ public class ImageDisplay {
         if (files == null) {
             return;
         }
-        folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
+        //folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
         for (File f : files) {
             if (f.getName().endsWith(".jpg") || f.getName().endsWith(".jpeg")
                     || f.getName().endsWith(".png") || f.getName().endsWith(".gif")
@@ -111,7 +111,7 @@ public class ImageDisplay {
             JLabel label = new JLabel("没有图片");
             imagePanel.add(label);
         }
-        numOfImagesLabel.setText("图片数量：" + numOfImages);
+        //numOfImagesLabel.setText("图片数量：" + numOfImages);
         // 用于动态添加或删除组件后更新面板布局和刷新显示
         imagePanel.revalidate();
         imagePanel.repaint();

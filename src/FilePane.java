@@ -11,6 +11,7 @@ public class FilePane {
     public JPanel panel1;
     private JTree tree;
     private ImageDisplay imageDisplay;
+    private File currentFile;
     // 创建一个线程池，用于遍历文件夹
     private final ExecutorService executorService;
     public FilePane() {
@@ -19,6 +20,7 @@ public class FilePane {
         panel1 = new JPanel(new BorderLayout()); // 修改布局管理器为BorderLayout
         // 获取系统的根目录(暂时用C:/Users代替)
         File rootFile = new File("C:/Users");
+        this.currentFile = rootFile;
         // 遍历根目录，获得目录树
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootFile);
         addNodes(root, rootFile);
@@ -48,12 +50,20 @@ public class FilePane {
                         File[] files = file.listFiles();
                         imageDisplay.addImageOnPane(files);
                     }
+                    // 添加事件转发
+                    currentFile = file;
+                    MouseEvent event = SwingUtilities.convertMouseEvent(tree, e, imageDisplay.getScrollPane());
+                    imageDisplay.getScrollPane().dispatchEvent(event);
                 }
             }
         });
         JScrollPane scrollPane = new JScrollPane(tree); // 将JTree添加到JScrollPane中
         panel1.add(scrollPane, BorderLayout.CENTER); // 将JScrollPane添加到JPanel中
 
+    }
+
+    public File getCurrentFile() {
+        return currentFile;
     }
 
     private void addNodes(DefaultMutableTreeNode root, File file) {
