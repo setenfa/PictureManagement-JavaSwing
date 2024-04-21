@@ -15,8 +15,12 @@ public class ImageDisplay {
     private int numOfImages;
     private JLabel folderNameLabel;
     private JLabel numOfImagesLabel;
+    private int selectedImages = 0;
+    private BottomPane bottomPane;
+    private long totalSize = 0;
 
     public ImageDisplay() {
+        this.bottomPane = new BottomPane();
         imagePanel = new JPanel();
         imagePanel.setLayout(new CustomFlowLayout(5));
         scrollPane = new JScrollPane(imagePanel);
@@ -30,21 +34,25 @@ public class ImageDisplay {
         scrollPane.setColumnHeaderView(infoPanel);
     }
 
-    public void addImageOnPane(File[] files) {
+    public void addImageOnPane(File[] files, String folderName) {
         // 清空原有的图片
         numOfImages = 0;
+        selectedImages = 0;
+        totalSize = 0;
+        final int[] selectedImages = {0};
         smallLabels.clear();
         smallTextFields.clear();
         smallPanels.clear();
         imagePanel.removeAll();
+        folderNameLabel.setText("当前文件夹：" + folderName);
         if (files == null) {
             return;
         }
-        folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
         for (File f : files) {
             if (f.getName().endsWith(".jpg") || f.getName().endsWith(".jpeg")
                     || f.getName().endsWith(".png") || f.getName().endsWith(".gif")
                     || f.getName().endsWith(".bmp")) {
+                totalSize += f.length();
                 ImageIcon icon = new ImageIcon(f.getPath());
                 // 缩放图片(gif格式的图片会失去动画效果的情况未解决)
                 Image image = icon.getImage();
@@ -52,8 +60,12 @@ public class ImageDisplay {
                 icon = new ImageIcon(scaledImage);
 
                 JLabel label = new JLabel(icon);
-                //label.setPreferredSize(new Dimension(100, 100)); // 设置JLabel的大小
-                JTextField textField = new JTextField(f.getName());
+                // 避免文件名过长导致图片变形
+                String fileName = f.getName();
+                if (fileName.length() > 10) {
+                    fileName = fileName.substring(0, 10) + "...";
+                }
+                JTextField textField = new JTextField(fileName);
                 // 取消文本框的边框，设置为不可编辑，居中对齐
                 textField.setBorder(null);
                 textField.setEditable(false);
@@ -75,32 +87,39 @@ public class ImageDisplay {
                             if (panel.getBorder() != null) {
                                 // 如果面板已经被选中，取消选中
                                 panel.setBorder(null);
+                                selectedImages[0]--;
+                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
                             } else {
                                 // 如果面板没有被选中，选中面板
                                 panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                                selectedImages[0]++;
+                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
                             }
                         } else if (e.getButton() == MouseEvent.BUTTON1) {
                             // 如果没有按下Ctrl键或鼠标左键，将所有面板的边框设为null，然后只为被点击的面板设置边框
-                            for(JPanel smallPanel : smallPanels) {
-                                smallPanel.setBorder(null);
-                            }
                             // 检查面板是否已经被选中
                             if (panel.getBorder() != null) {
                                 // 如果面板已经被选中，取消选中
                                 panel.setBorder(null);
+                                selectedImages[0]--;
+                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
                             } else {
                                 // 如果面板没有被选中，选中面板
+                                for(JPanel smallPanel : smallPanels) {
+                                    smallPanel.setBorder(null);
+                                }
                                 panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                                selectedImages[0] = 1;
+                                bottomPane.updateInfo(numOfImages,totalSize , selectedImages[0]);
                             }
                         }
                     }
                 });
 
-                smallLabels.add(label);
-                smallTextFields.add(textField);
                 smallPanels.add(panel);
             }
         }
+        bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
         // 将小面板添加到主面板，如果没有则显示没有图片
         if (!smallPanels.isEmpty()) {
             for (JPanel smallPanel : smallPanels) {
@@ -119,5 +138,9 @@ public class ImageDisplay {
 
     public JScrollPane getScrollPane() {
         return scrollPane;
+    }
+
+    public BottomPane getBottomPane() {
+        return bottomPane;
     }
 }
