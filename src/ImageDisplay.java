@@ -116,6 +116,18 @@ public class ImageDisplay {
                     }
                 });
 
+                imagePanel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        // 当用户点击imagePanel时，取消所有面板的选中状态
+                        for(JPanel smallPanel : smallPanels) {
+                            smallPanel.setBorder(null);
+                        }
+                        selectedImages[0] = 0;
+                        bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
+                    }
+                });
+
                 smallPanels.add(panel);
             }
         }
