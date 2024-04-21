@@ -1,11 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ImageDisplay {
+
     JPanel imagePanel;
     JScrollPane scrollPane;
     ArrayList<JLabel> smallLabels = new ArrayList<>();
@@ -18,6 +23,8 @@ public class ImageDisplay {
     private int selectedImages = 0;
     private BottomPane bottomPane;
     private long totalSize = 0;
+    ArrayList<String> selectedImagePaths = new ArrayList<>();
+    private String currentDirectory;
 
     public ImageDisplay() {
         this.bottomPane = new BottomPane();
@@ -39,7 +46,7 @@ public class ImageDisplay {
         numOfImages = 0;
         selectedImages = 0;
         totalSize = 0;
-        final int[] selectedImages = {0};
+
         smallLabels.clear();
         smallTextFields.clear();
         smallPanels.clear();
@@ -47,6 +54,13 @@ public class ImageDisplay {
         folderNameLabel.setText("当前文件夹：" + folderName);
         if (files == null) {
             return;
+        }
+        if (files.length == 0) {
+            JLabel label = new JLabel("没有图片");
+            imagePanel.add(label);
+            return;
+        } else {
+            currentDirectory = files[0].getParent();
         }
         for (File f : files) {
             if (f.getName().endsWith(".jpg") || f.getName().endsWith(".jpeg")
@@ -76,7 +90,7 @@ public class ImageDisplay {
                 panel.setLayout(boxLayout);
                 panel.add(label);
                 panel.add(textField);
-
+                panel.putClientProperty("imagePath", f.getPath());
                 // 添加鼠标监听器，图片选中(暂时搁置，后续添加图片选中功能)
                 panel.addMouseListener(new MouseAdapter() {
                     @Override
@@ -87,13 +101,15 @@ public class ImageDisplay {
                             if (panel.getBorder() != null) {
                                 // 如果面板已经被选中，取消选中
                                 panel.setBorder(null);
-                                selectedImages[0]--;
-                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
+                                selectedImages--;
+                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
+                                selectedImagePaths.remove(panel.getClientProperty("imagePath").toString());
                             } else {
                                 // 如果面板没有被选中，选中面板
                                 panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                                selectedImages[0]++;
-                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
+                                selectedImages++;
+                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
+                                selectedImagePaths.add(panel.getClientProperty("imagePath").toString());
                             }
                         } else if (e.getButton() == MouseEvent.BUTTON1) {
                             // 如果没有按下Ctrl键或鼠标左键，将所有面板的边框设为null，然后只为被点击的面板设置边框
@@ -101,16 +117,18 @@ public class ImageDisplay {
                             if (panel.getBorder() != null) {
                                 // 如果面板已经被选中，取消选中
                                 panel.setBorder(null);
-                                selectedImages[0]--;
-                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
+                                selectedImages = 0;
+                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
+                                selectedImagePaths.clear();
                             } else {
                                 // 如果面板没有被选中，选中面板
                                 for(JPanel smallPanel : smallPanels) {
                                     smallPanel.setBorder(null);
                                 }
                                 panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                                selectedImages[0] = 1;
-                                bottomPane.updateInfo(numOfImages,totalSize , selectedImages[0]);
+                                selectedImages = 1;
+                                bottomPane.updateInfo(numOfImages,totalSize , selectedImages);
+                                selectedImagePaths.add(panel.getClientProperty("imagePath").toString());
                             }
                         }
                     }
@@ -119,19 +137,21 @@ public class ImageDisplay {
                 imagePanel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        // 当用户点击imagePanel时，取消所有面板的选中状态
-                        for(JPanel smallPanel : smallPanels) {
-                            smallPanel.setBorder(null);
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            // 当用户点击imagePanel时，取消所有面板的选中状态
+                            for(JPanel smallPanel : smallPanels) {
+                                smallPanel.setBorder(null);
+                            }
+                            selectedImages = 0;
+                            bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
                         }
-                        selectedImages[0] = 0;
-                        bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
                     }
                 });
 
                 smallPanels.add(panel);
             }
         }
-        bottomPane.updateInfo(numOfImages, totalSize, selectedImages[0]);
+        bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
         // 将小面板添加到主面板，如果没有则显示没有图片
         if (!smallPanels.isEmpty()) {
             for (JPanel smallPanel : smallPanels) {
@@ -147,6 +167,30 @@ public class ImageDisplay {
         imagePanel.revalidate();
         imagePanel.repaint();
     }
+    // 删除图片,并更新面板
+    public void deleteImage(String imagePath){
+        Path path = Paths.get(imagePath);
+        try{
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
+            smallPanels.removeIf(panel -> imagePath.equals(panel.getClientProperty("imagePath")));
+            selectedImagePaths.remove(imagePath);
+            refreshImages();
+        } catch (IOException E){
+            E.printStackTrace();
+        }
+    }
+
+    public void refreshImages() {
+        // 清除当前显示的所有图片
+        File directory = new File(currentDirectory);
+        File[] files = directory.listFiles(file -> file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")
+                || file.getName().endsWith(".png") || file.getName().endsWith(".gif")
+                || file.getName().endsWith(".bmp"));
+        addImageOnPane(files, directory.getName());
+
+    }
 
     public JScrollPane getScrollPane() {
         return scrollPane;
@@ -154,5 +198,11 @@ public class ImageDisplay {
 
     public BottomPane getBottomPane() {
         return bottomPane;
+    }
+    public ArrayList<String> getSelectedImagePaths() {
+        return selectedImagePaths;
+    }
+    public JPanel getImagePanel() {
+        return imagePanel;
     }
 }
