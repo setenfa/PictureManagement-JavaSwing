@@ -1,3 +1,5 @@
+package ui;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -10,7 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ImageDisplay {
-
     JPanel imagePanel;
     JScrollPane scrollPane;
     ArrayList<JLabel> smallLabels = new ArrayList<>();
@@ -29,16 +30,10 @@ public class ImageDisplay {
     public ImageDisplay() {
         this.bottomPane = new BottomPane();
         imagePanel = new JPanel();
-        imagePanel.setLayout(new CustomFlowLayout(5));
+        // imagePanel.setLayout(new CustomFlowLayout(5));
         scrollPane = new JScrollPane(imagePanel);
         scrollPane.setPreferredSize(new Dimension(800, 600));
 
-        JPanel infoPanel = new JPanel();
-        folderNameLabel = new JLabel();
-        numOfImagesLabel = new JLabel();
-        infoPanel.add(folderNameLabel);
-        infoPanel.add(numOfImagesLabel);
-        scrollPane.setColumnHeaderView(infoPanel);
     }
 
     public void addImageOnPane(File[] files, String folderName) {
@@ -51,10 +46,10 @@ public class ImageDisplay {
         smallTextFields.clear();
         smallPanels.clear();
         imagePanel.removeAll();
-        folderNameLabel.setText("当前文件夹：" + folderName);
         if (files == null) {
             return;
         }
+        //folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
         if (files.length == 0) {
             JLabel label = new JLabel("没有图片");
             imagePanel.add(label);
@@ -161,7 +156,7 @@ public class ImageDisplay {
             JLabel label = new JLabel("没有图片");
             imagePanel.add(label);
         }
-        numOfImagesLabel.setText("图片数量：" + numOfImages);
+        //numOfImagesLabel.setText("图片数量：" + numOfImages);
         bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
         // 用于动态添加或删除组件后更新面板布局和刷新显示
         imagePanel.revalidate();
