@@ -1,3 +1,5 @@
+package ui;
+
 import javax.swing.*;
 public class BottomPane extends JPanel{
     private JLabel infoLabel;
