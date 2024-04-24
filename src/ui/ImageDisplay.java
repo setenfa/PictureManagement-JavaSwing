@@ -19,8 +19,6 @@ public class ImageDisplay {
     ArrayList<JPanel> smallPanels = new ArrayList<>();
     // 记录当前面板中的图片数量
     private int numOfImages;
-    private JLabel folderNameLabel;
-    private JLabel numOfImagesLabel;
     private int selectedImages = 0;
     private BottomPane bottomPane;
     private long totalSize = 0;
@@ -163,19 +161,7 @@ public class ImageDisplay {
         imagePanel.repaint();
     }
     // 删除图片,并更新面板
-    public void deleteImage(String imagePath){
-        Path path = Paths.get(imagePath);
-        try{
-            if (Files.exists(path)) {
-                Files.delete(path);
-            }
-            smallPanels.removeIf(panel -> imagePath.equals(panel.getClientProperty("imagePath")));
-            selectedImagePaths.remove(imagePath);
-            refreshImages();
-        } catch (IOException E){
-            E.printStackTrace();
-        }
-    }
+
 
     public void refreshImages() {
         // 清除当前显示的所有图片
@@ -199,5 +185,11 @@ public class ImageDisplay {
     }
     public JPanel getImagePanel() {
         return imagePanel;
+    }
+    public ArrayList<JPanel> getSmallPanels() {
+        return smallPanels;
+    }
+    public String getCurrentDirectory() {
+        return currentDirectory;
     }
 }
