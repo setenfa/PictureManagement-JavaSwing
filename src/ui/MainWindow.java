@@ -16,6 +16,7 @@ public class MainWindow {
 
     private JPanel pathBar;
 
+
     public MainWindow(FilePane fileNode, int width, int height) {
         this.fileNode = fileNode;
         this.fileNode.getImageDisplay().getScrollPane().addMouseListener(new MouseAdapter() {
@@ -33,6 +34,7 @@ public class MainWindow {
         JFrame mainWindow = new JFrame("电子图片管理程序");
         mainWindow.setSize(width, height);
         mainWindow.add(this.main);
+        mainWindow.add(this.fileNode.getImageDisplay().getBottomPane(), BorderLayout.SOUTH);
         mainWindow.setBackground(Color.WHITE);
         mainWindow.setVisible(true);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
