@@ -110,16 +110,17 @@ public class ImageDisplay {
                             if (panel.getBorder() != null) {
                                 // 如果面板已经被选中，取消选中
                                 panel.setBorder(null);
-                                selectedImages = 0;
+                                selectedImages -= 1;
                                 bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
-                                selectedImagePaths.clear();
+                                selectedImagePaths.remove(panel.getClientProperty("imagePath").toString());
+                                System.out.println(selectedImagePaths.size());
                             } else {
                                 // 如果面板没有被选中，选中面板
                                 for(JPanel smallPanel : smallPanels) {
                                     smallPanel.setBorder(null);
                                 }
                                 panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                                selectedImages = 1;
+                                selectedImages += 1;
                                 bottomPane.updateInfo(numOfImages,totalSize , selectedImages);
                                 selectedImagePaths.add(panel.getClientProperty("imagePath").toString());
                             }
@@ -136,6 +137,7 @@ public class ImageDisplay {
                                 smallPanel.setBorder(null);
                             }
                             selectedImages = 0;
+                            selectedImagePaths.clear();
                             bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
                         }
                     }
