@@ -124,7 +124,7 @@ public class ImageMenuItem {
         }
     }
 
-    // 粘贴图片
+    // 粘贴图片(粘贴遇到同名未解决)
     public void pasteImage(){
         for (String path : copiedImagePaths) {
             Path src = Paths.get(path);
