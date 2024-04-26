@@ -39,12 +39,12 @@ public class FilePane {
         File[] rootFile = File.listRoots();
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         for (File file : rootFile) {
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(file.getPath());
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(file);
             executorService.submit(() -> addNodes(node, file));
             root.add(node);
         }
-        DefaultTreeModel treeModel = new DefaultTreeModel(root);
-        this.tree = new JTree(treeModel);
+
+        this.tree = new JTree(root);
         tree.setRootVisible(false);
     }
 
@@ -57,9 +57,6 @@ public class FilePane {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
                 Object userObject = node.getUserObject();
-                if (userObject == null) {
-                    return this;
-                }
                 if (userObject instanceof File) {
                     File file = (File) userObject;
                     setText(file.getName());
