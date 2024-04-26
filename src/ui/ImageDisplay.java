@@ -58,6 +58,7 @@ public class ImageDisplay {
         }
         //folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
         if (files.length == 0) {
+            infoLabel.setText("当前文件夹：" + folderName + "，图片数量：" + numOfImages);
             return;
         } else {
             currentDirectory = files[0].getParent();
@@ -126,8 +127,9 @@ public class ImageDisplay {
                                     smallPanel.setBorder(null);
                                 }
                                 panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                                selectedImages += 1;
+                                selectedImages = 1;
                                 bottomPane.updateInfo(numOfImages,totalSize , selectedImages);
+                                selectedImagePaths.clear();
                                 selectedImagePaths.add(panel.getClientProperty("imagePath").toString());
                             }
                         }
