@@ -8,6 +8,7 @@ public class BottomPane extends JPanel{
         infoLabel = new JLabel();
         infoLabel.setHorizontalAlignment(SwingConstants.LEFT);
         add(infoLabel);
+        infoLabel.setText("0张图片(0MB) - 选中0张图片");
     }
 
     public void updateInfo(int totalImages, long totalSize, int selectedImages){
