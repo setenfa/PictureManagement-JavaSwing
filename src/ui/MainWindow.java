@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import util.ui.Button;
 import util.ui.MyLayoutManager;
@@ -15,7 +16,6 @@ public class MainWindow {
     private FilePane fileNode;
 
     private JPanel pathBar;
-
 
     public MainWindow(FilePane fileNode, int width, int height) {
         this.fileNode = fileNode;
@@ -44,7 +44,8 @@ public class MainWindow {
     private void initialMainPanel(int width, int height) {
         this.main = new JPanel(new MainWindowLayout());
         this.main.setSize(width, height);
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.fileNode.panel1, this.fileNode.getImageDisplay().getScrollPane());
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.fileNode.panel1,
+                this.fileNode.getImageDisplay().getScrollPane());
         splitPane.setDividerLocation((int) (width * 0.3));
         splitPane.setDividerSize(2);
         this.main.add(splitPane);
@@ -67,15 +68,15 @@ public class MainWindow {
         Button button4 = new Button("前往", 24, 24) {
             @Override
             public void todo() {
-                if (!fileNode.updateTree(path.getText())) {
-                    updatePath();
+                File folder = new File(path.getText());
+                if (folder.isDirectory()) {
+                    File[] files = folder.listFiles();
+                    // 获取文件夹名称和图片
+                    String folderName = folder.getName();
+                    fileNode.getImageDisplay().addImageOnPane(files, folderName);
+                    fileNode.setCurrentFile(folder);
                 }
-                for(Component comp : main.getComponents()) {
-                    if(comp instanceof JSplitPane) {
-                        comp.revalidate();
-                        comp.repaint();
-                    }
-                }
+                updatePath();
             }
         };
         // 实现不了，不做了
@@ -86,7 +87,7 @@ public class MainWindow {
         this.pathBar.add(button4);
     }
 
-    //更新路径
+    // 更新路径
     private void updatePath() {
         Component[] components = pathBar.getComponents();
         for (Component component : components) {
@@ -116,7 +117,8 @@ public class MainWindow {
                             if (width >= main.getWidth() && path != null) {
                                 path.setSize(path.getWidth() - comp.getWidth() - 8, path.getHeight());
                                 width -= comp.getWidth() + 4;
-                                comp.setBounds(path.getX() + path.getWidth() + 4, height, comp.getWidth(), comp.getHeight());
+                                comp.setBounds(path.getX() + path.getWidth() + 4, height, comp.getWidth(),
+                                        comp.getHeight());
                             } else {
                                 comp.setBounds(width, height, comp.getWidth(), comp.getHeight());
                             }
@@ -129,9 +131,9 @@ public class MainWindow {
 
                     }
                     component.setBounds(0, 0, pathBar.getWidth(), pathBar.getHeight());
-                }
-                else if (component instanceof JSplitPane) {
-                    component.setBounds(-1, pathBar.getHeight(), main.getWidth() + 4, main.getHeight() - pathBar.getHeight() + 3);
+                } else if (component instanceof JSplitPane) {
+                    component.setBounds(-1, pathBar.getHeight(), main.getWidth() + 4,
+                            main.getHeight() - pathBar.getHeight() + 3);
                 }
             }
         }
@@ -143,11 +145,9 @@ public class MainWindow {
                 comp.setBounds(0, 0, pathBar.getWidth(), pathBar.getHeight());
             }
             if (comp instanceof JSplitPane) {
-                comp.setBounds(-1, pathBar.getHeight(), main.getWidth() + 4, main.getHeight() - pathBar.getHeight() + 3);
+                comp.setBounds(-1, pathBar.getHeight(), main.getWidth() + 4,
+                        main.getHeight() - pathBar.getHeight() + 3);
             }
         }
     }
 }
-
-
-
