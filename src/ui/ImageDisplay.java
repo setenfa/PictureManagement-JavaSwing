@@ -3,17 +3,15 @@ package ui;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import ui.CustomFlowLayout;
 public class ImageDisplay {
     JPanel imagePanel;
     JScrollPane scrollPane;
+    JPanel infoPanel;
+    JLabel infoLabel;
     ArrayList<JLabel> smallLabels = new ArrayList<>();
     ArrayList<JTextField> smallTextFields = new ArrayList<>();
     ArrayList<JPanel> smallPanels = new ArrayList<>();
@@ -26,12 +24,23 @@ public class ImageDisplay {
     private String currentDirectory;
 
     public ImageDisplay() {
+        this.infoLabel = new JLabel();
+        infoLabel.setHorizontalAlignment(JLabel.CENTER);
+        infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.add(infoLabel);
         this.bottomPane = new BottomPane();
         imagePanel = new JPanel();
-        // imagePanel.setLayout(new CustomFlowLayout(5));
+        imagePanel.setLayout(new CustomFlowLayout(5));
+        // 用于放大或缩小imagePanel刷新组件的显示
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                imagePanel.revalidate();
+                imagePanel.repaint();
+            }
+        });
         scrollPane = new JScrollPane(imagePanel);
         scrollPane.setPreferredSize(new Dimension(800, 600));
-
+        scrollPane.setColumnHeaderView(infoPanel);
     }
 
     public void addImageOnPane(File[] files, String folderName) {
@@ -49,8 +58,6 @@ public class ImageDisplay {
         }
         //folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
         if (files.length == 0) {
-            JLabel label = new JLabel("没有图片");
-            imagePanel.add(label);
             return;
         } else {
             currentDirectory = files[0].getParent();
@@ -78,11 +85,10 @@ public class ImageDisplay {
                 textField.setEditable(false);
                 textField.setHorizontalAlignment(JTextField.LEFT);
                 JPanel panel = new JPanel();
-                // 设定panel为箱式布局，让textfield和label垂直排列
-                BoxLayout boxLayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
-                panel.setLayout(boxLayout);
-                panel.add(label);
-                panel.add(textField);
+                // 设定panel为箱式布局，让textField和label垂直排列
+                panel.setLayout(new BorderLayout());
+                panel.add(label, BorderLayout.CENTER);
+                panel.add(textField, BorderLayout.SOUTH);
                 panel.putClientProperty("imagePath", f.getPath());
                 // 添加鼠标监听器，图片选中(暂时搁置，后续添加图片选中功能)
                 panel.addMouseListener(new MouseAdapter() {
@@ -127,7 +133,6 @@ public class ImageDisplay {
                         }
                     }
                 });
-
                 imagePanel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -152,11 +157,8 @@ public class ImageDisplay {
                 imagePanel.add(smallPanel);
                 numOfImages++;
             }
-        } else {
-            JLabel label = new JLabel("没有图片");
-            imagePanel.add(label);
         }
-        //numOfImagesLabel.setText("图片数量：" + numOfImages);
+        infoLabel.setText("当前文件夹：" + folderName + "，图片数量：" + numOfImages);
         bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
         // 用于动态添加或删除组件后更新面板布局和刷新显示
         imagePanel.revalidate();
