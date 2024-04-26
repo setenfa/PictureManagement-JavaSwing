@@ -78,9 +78,10 @@ public class MainWindow {
                 }
             }
         };
-        this.pathBar.add(button1);
-        this.pathBar.add(button2);
-        this.pathBar.add(button3);
+        // 实现不了，不做了
+        // this.pathBar.add(button1);
+        // this.pathBar.add(button2);
+        // this.pathBar.add(button3);
         this.pathBar.add(path);
         this.pathBar.add(button4);
     }
