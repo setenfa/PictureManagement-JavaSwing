@@ -120,7 +120,6 @@ public class ImageDisplay {
                                 selectedImages -= 1;
                                 bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
                                 selectedImagePaths.remove(panel.getClientProperty("imagePath").toString());
-                                System.out.println(selectedImagePaths.size());
                             } else {
                                 // 如果面板没有被选中，选中面板
                                 for(JPanel smallPanel : smallPanels) {
