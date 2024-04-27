@@ -124,11 +124,26 @@ public class ImageMenuItem {
         }
     }
 
-    // 粘贴图片(粘贴遇到同名未解决)
+    // 粘贴图片
     public void pasteImage(){
         for (String path : copiedImagePaths) {
             Path src = Paths.get(path);
-            Path dest = Paths.get(imageDisplay.getCurrentDirectory() + "/" + src.getFileName());
+            String originalFileName = src.getFileName().toString();
+            String newFileName = originalFileName;
+            Path dest = Paths.get(imageDisplay.getCurrentDirectory() + "/" + newFileName);
+            int counter = 1;
+            while (Files.exists(dest)) {
+                int dotIndex = originalFileName.lastIndexOf('.');
+                if (dotIndex > 0) {
+                    String nameWithoutExtension = originalFileName.substring(0, dotIndex);
+                    String extension = originalFileName.substring(dotIndex);
+                    newFileName = nameWithoutExtension + "(" + counter + ")" + extension;
+                } else {
+                    newFileName = originalFileName + "(" + counter + ")";
+                }
+                dest = Paths.get(imageDisplay.getCurrentDirectory() + "/" + newFileName);
+                counter++;
+            }
             try {
                 Files.copy(src, dest);
             } catch (IOException e) {
