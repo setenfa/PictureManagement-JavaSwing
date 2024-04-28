@@ -79,9 +79,14 @@ public class FilePane {
                         File file = (File) userObject;
                         if (file.isDirectory()) {
                             File[] files = file.listFiles();
+                            if (files == null) {
+                                imageDisplay.getImagePanel().repaint();
+                                return;
+                            }
                             // 获取文件夹名称和图片
                             String folderName = file.getName();
                             imageDisplay.addImageOnPane(files, folderName);
+                            imageDisplay.getImagePanel().repaint();
                             currentFile = file;
                         }
                     }
