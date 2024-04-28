@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import ui.CustomFlowLayout;
+import function.ImageSlideshowWindow;
 public class ImageDisplay {
     JPanel imagePanel;
     JScrollPane scrollPane;
@@ -22,6 +22,7 @@ public class ImageDisplay {
     private long totalSize = 0;
     ArrayList<String> selectedImagePaths = new ArrayList<>();
     private String currentDirectory;
+    private ImageSlideshowWindow slideshowWindow;
 
     public ImageDisplay() {
         this.infoLabel = new JLabel();
@@ -75,6 +76,7 @@ public class ImageDisplay {
                 icon = new ImageIcon(scaledImage);
 
                 JLabel label = new JLabel(icon);
+                smallLabels.add(label);
                 // 避免文件名过长导致图片变形
                 String fileName = f.getName();
                 if (fileName.length() > 10) {
@@ -95,8 +97,16 @@ public class ImageDisplay {
                 panel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        // 检查是否按下了Ctrl键和鼠标左键
-                        if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON1) {
+                        ImageDisplay thisImageDisplay = ImageDisplay.this;
+                        if (e.getClickCount() == 2) {
+                            // 双击打开图片
+                            // System.out.println("点击了两次");
+                            if (slideshowWindow != null) {
+                                slideshowWindow.dispose();
+                            }
+                            slideshowWindow = new ImageSlideshowWindow(smallPanels.indexOf(panel), thisImageDisplay);
+                            slideshowWindow.showImage();
+                        } else if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON1) {
                             // 如果按下了Ctrl键和鼠标左键，检查面板是否已经被选中
                             if (panel.getBorder() != null) {
                                 // 如果面板已经被选中，取消选中
@@ -114,20 +124,14 @@ public class ImageDisplay {
                         } else if (e.getButton() == MouseEvent.BUTTON1) {
                             // 如果没有按下Ctrl键或鼠标左键，将所有面板的边框设为null，然后只为被点击的面板设置边框
                             // 检查面板是否已经被选中
-                            if (panel.getBorder() != null) {
-                                // 如果面板已经被选中，取消选中
-                                panel.setBorder(null);
-                                selectedImages -= 1;
-                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
-                                selectedImagePaths.remove(panel.getClientProperty("imagePath").toString());
-                            } else {
+                            if (panel.getBorder() == null) {
                                 // 如果面板没有被选中，选中面板
-                                for(JPanel smallPanel : smallPanels) {
+                                for (JPanel smallPanel : smallPanels) {
                                     smallPanel.setBorder(null);
                                 }
                                 panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
                                 selectedImages = 1;
-                                bottomPane.updateInfo(numOfImages,totalSize , selectedImages);
+                                bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
                                 selectedImagePaths.clear();
                                 selectedImagePaths.add(panel.getClientProperty("imagePath").toString());
                             }
@@ -197,4 +201,9 @@ public class ImageDisplay {
     public String getCurrentDirectory() {
         return currentDirectory;
     }
+
+    public ArrayList<JLabel> getSmallLabels() {
+        return smallLabels;
+    }
+
 }
