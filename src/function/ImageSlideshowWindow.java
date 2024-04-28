@@ -37,19 +37,23 @@ public class ImageSlideshowWindow extends JFrame {
         previousButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                index--;
-                if (index < 0) {
+                if (index == 0) {
                     JOptionPane.showMessageDialog(null, "已经是第一张图片了");
+                } else {
+                    index--;
+                    System.out.println(index);
+                    showImage();
                 }
             }
         });
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                index++;
-                if (index > imageDisplay.getSmallPanels().size()) {
+                if (index == imageDisplay.getSmallPanels().size() - 1) {
                     JOptionPane.showMessageDialog(null, "已经是最后一张图片了");
                 } else {
+                    index++;
+                    System.out.println(index);
                     showImage();
                 }
             }
@@ -67,6 +71,5 @@ public class ImageSlideshowWindow extends JFrame {
         imageLabel.setIcon(imageIcon);
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER); // 设置水平居中
         imageLabel.setVerticalAlignment(SwingConstants.CENTER); // 设置垂直居中
-        index++;
     }
 }
