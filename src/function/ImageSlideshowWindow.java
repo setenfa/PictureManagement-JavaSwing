@@ -12,6 +12,8 @@ public class ImageSlideshowWindow extends JFrame {
     private int index;
     // 存放图片
     private JLabel imageLabel;
+    private boolean isAutoPlaying = false;
+    private Thread autoPlayThread;
 
     public ImageSlideshowWindow(int index, ImageDisplay imageDisplay) {
         this.imageDisplay = imageDisplay;
@@ -21,6 +23,7 @@ public class ImageSlideshowWindow extends JFrame {
         JToolBar toolBar = initToolBar();
         add(imageLabel, "Center");
         add(toolBar, "South");
+        setTitle("幻灯片播放");
         // 全屏
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -41,7 +44,6 @@ public class ImageSlideshowWindow extends JFrame {
                     JOptionPane.showMessageDialog(null, "已经是第一张图片了");
                 } else {
                     index--;
-                    System.out.println(index);
                     showImage();
                 }
             }
@@ -53,8 +55,19 @@ public class ImageSlideshowWindow extends JFrame {
                     JOptionPane.showMessageDialog(null, "已经是最后一张图片了");
                 } else {
                     index++;
-                    System.out.println(index);
                     showImage();
+                }
+            }
+        });
+        autoPlayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ("自动播放".equals(autoPlayButton.getText())) {
+                    autoPlayButton.setText("  ||  ");
+                    autoPlay();
+                } else {
+                    autoPlayButton.setText("自动播放");
+                    stopAutoPlay();
                 }
             }
         });
@@ -71,5 +84,33 @@ public class ImageSlideshowWindow extends JFrame {
         imageLabel.setIcon(imageIcon);
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER); // 设置水平居中
         imageLabel.setVerticalAlignment(SwingConstants.CENTER); // 设置垂直居中
+    }
+
+    // 自动播放
+    public void autoPlay() {
+        isAutoPlaying = true;
+        autoPlayThread = new Thread(() -> {
+            while (isAutoPlaying && !Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                if (index == imageDisplay.getSmallPanels().size() - 1) {
+                    index = 0;
+                } else {
+                    index++;
+                }
+                showImage();
+            }
+        });
+        autoPlayThread.start();
+    }
+
+    public void stopAutoPlay() {
+        isAutoPlaying = false;
+        if (autoPlayThread != null) {
+            autoPlayThread.interrupt();
+        }
     }
 }
