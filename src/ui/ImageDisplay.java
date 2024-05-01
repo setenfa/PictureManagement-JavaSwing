@@ -15,6 +15,7 @@ public class ImageDisplay {
     ArrayList<JLabel> smallLabels = new ArrayList<>();
     ArrayList<JTextField> smallTextFields = new ArrayList<>();
     ArrayList<JPanel> smallPanels = new ArrayList<>();
+    ArrayList<ImageIcon> originalIcons = new ArrayList<>();
     // 记录当前面板中的图片数量
     private int numOfImages;
     private int selectedImages = 0;
@@ -70,6 +71,7 @@ public class ImageDisplay {
                     || f.getName().endsWith(".bmp")) {
                 totalSize += f.length();
                 ImageIcon icon = new ImageIcon(f.getPath());
+                originalIcons.add(icon);
                 // 缩放图片(gif格式的图片会失去动画效果的情况未解决)
                 Image image = icon.getImage();
                 Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
@@ -206,4 +208,7 @@ public class ImageDisplay {
         return smallLabels;
     }
 
+    public ArrayList<ImageIcon> getOriginalIcons() {
+        return originalIcons;
+    }
 }
