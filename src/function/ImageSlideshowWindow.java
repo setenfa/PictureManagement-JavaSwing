@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 public class ImageSlideshowWindow extends JFrame {
     private ImageDisplay imageDisplay;
@@ -125,15 +126,21 @@ public class ImageSlideshowWindow extends JFrame {
     }
 
     public ImageIcon zoomIn(ImageIcon imageIcon, double radio) {
-        int width = (int) (imageIcon.getIconWidth() * radio);
-        int height = (int) (imageIcon.getIconHeight() * radio);
-        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        BufferedImage image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics g = image.getGraphics();
+        imageIcon.paintIcon(null, g, 0, 0);
+        g.dispose();
+        BufferedImage resizedImage = ImageResizer.resize(image, radio);
+        return new ImageIcon(resizedImage);
     }
 
     public ImageIcon zoomOut(ImageIcon imageIcon, double radio) {
-        int width = (int) (imageIcon.getIconWidth() / radio);
-        int height = (int) (imageIcon.getIconHeight() / radio);
-        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        BufferedImage image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics g = image.getGraphics();
+        imageIcon.paintIcon(null, g, 0, 0);
+        g.dispose();
+        BufferedImage resizedImage = ImageResizer.resize(image, 1 / radio);
+        return new ImageIcon(resizedImage);
     }
 
     public void stopAutoPlay() {
