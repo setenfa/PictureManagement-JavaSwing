@@ -3,6 +3,7 @@ package function;
 import ui.ImageDisplay;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -59,6 +60,22 @@ public class ImageSlideshowWindow extends JFrame {
                 }
             }
         });
+        zoomInButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ImageIcon originalIcon = (ImageIcon)imageLabel.getIcon();
+                ImageIcon zoomedIcon = zoomIn(originalIcon, 1.2);
+                imageLabel.setIcon(zoomedIcon);
+            }
+        });
+        zoomOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ImageIcon originalIcon = (ImageIcon)imageLabel.getIcon();
+                ImageIcon zoomedIcon = zoomOut(originalIcon, 1.2);
+                imageLabel.setIcon(zoomedIcon);
+            }
+        });
         autoPlayButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,7 +97,7 @@ public class ImageSlideshowWindow extends JFrame {
     }
 
     public void showImage() {
-        Icon imageIcon = imageDisplay.getSmallLabels().get(index).getIcon();
+        Icon imageIcon = imageDisplay.getOriginalIcons().get(index);
         imageLabel.setIcon(imageIcon);
         imageLabel.setHorizontalAlignment(SwingConstants.CENTER); // 设置水平居中
         imageLabel.setVerticalAlignment(SwingConstants.CENTER); // 设置垂直居中
@@ -105,6 +122,18 @@ public class ImageSlideshowWindow extends JFrame {
             }
         });
         autoPlayThread.start();
+    }
+
+    public ImageIcon zoomIn(ImageIcon imageIcon, double radio) {
+        int width = (int) (imageIcon.getIconWidth() * radio);
+        int height = (int) (imageIcon.getIconHeight() * radio);
+        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+    }
+
+    public ImageIcon zoomOut(ImageIcon imageIcon, double radio) {
+        int width = (int) (imageIcon.getIconWidth() / radio);
+        int height = (int) (imageIcon.getIconHeight() / radio);
+        return new ImageIcon(imageIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
     }
 
     public void stopAutoPlay() {
