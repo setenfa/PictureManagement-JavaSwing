@@ -72,12 +72,32 @@ public class ImageDisplay {
                 totalSize += f.length();
                 ImageIcon icon = new ImageIcon(f.getPath());
                 originalIcons.add(icon);
-                // 缩放图片(gif格式的图片会失去动画效果的情况未解决)
+                int originalWidth = icon.getIconWidth();
+                int originalHeight = icon.getIconHeight();
+
+                // 设置最大的宽度和高度
+                int maxWidth = 100;
+                int maxHeight = 100;
+
+                // 计算缩放后的宽度和高度，保持纵横比不变
+                int scaledWidth;
+                int scaledHeight;
+                if (originalWidth > originalHeight) {
+                    scaledWidth = maxWidth;
+                    scaledHeight = (int) (originalHeight * ((double) maxWidth / originalWidth));
+                } else {
+                    scaledHeight = maxHeight;
+                    scaledWidth = (int) (originalWidth * ((double) maxHeight / originalHeight));
+                }
+
+                // 缩放图片
                 Image image = icon.getImage();
-                Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                Image scaledImage = image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
                 icon = new ImageIcon(scaledImage);
 
                 JLabel label = new JLabel(icon);
+                // 设置label的大小
+                label.setPreferredSize(new Dimension(maxWidth, maxHeight));
                 smallLabels.add(label);
                 // 避免文件名过长导致图片变形
                 String fileName = f.getName();
@@ -93,7 +113,7 @@ public class ImageDisplay {
                 // 设定panel为箱式布局，让textField和label垂直排列
                 panel.setLayout(new BorderLayout());
                 panel.add(label, BorderLayout.CENTER);
-                panel.add(textField, BorderLayout.SOUTH);
+                panel.add(textField, BorderLayout.PAGE_END);
                 panel.putClientProperty("imagePath", f.getPath());
                 // 添加鼠标监听器，图片选中(暂时搁置，后续添加图片选中功能)
                 panel.addMouseListener(new MouseAdapter() {
