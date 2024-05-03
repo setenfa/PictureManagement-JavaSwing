@@ -1,11 +1,17 @@
 package ui;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
+
 import function.ImageSlideshowWindow;
 public class ImageDisplay {
     JPanel imagePanel;
@@ -45,6 +51,46 @@ public class ImageDisplay {
         scrollPane.setColumnHeaderView(infoPanel);
     }
 
+    private static boolean isGifImage(File file) throws IOException {
+        return file.getName().toLowerCase().endsWith(".gif");
+    }
+
+    public void refreshImages() {
+        // 清除当前显示的所有图片
+        File directory = new File(currentDirectory);
+        File[] files = directory.listFiles(file -> file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")
+                || file.getName().endsWith(".png") || file.getName().endsWith(".gif")
+                || file.getName().endsWith(".bmp"));
+        addImageOnPane(files, directory.getName());
+    }
+
+    private static ArrayList<ImageIcon> readGifFrames(File file) throws IOException {
+        ArrayList<ImageIcon> frames = new ArrayList<>();
+        ImageReader reader = null;
+        ImageInputStream input = null;
+        try {
+            input = ImageIO.createImageInputStream(file);
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
+            if (readers.hasNext()) {
+                reader = readers.next();
+                reader.setInput(input);
+                int numFrames = reader.getNumImages(true);
+                for (int i = 0; i < numFrames; i++) {
+                    Image frame = reader.read(i);
+                    frames.add(new ImageIcon(frame));
+                }
+            }
+        } finally {
+            if (reader != null) {
+                reader.dispose();
+            }
+            if (input != null) {
+                input.close();
+            }
+        }
+        return frames;
+    }
+
     public void addImageOnPane(File[] files, String folderName) {
         // 清空原有的图片
         numOfImages = 0;
@@ -70,7 +116,17 @@ public class ImageDisplay {
                     || f.getName().endsWith(".png") || f.getName().endsWith(".gif")
                     || f.getName().endsWith(".bmp")) {
                 totalSize += f.length();
-                ImageIcon icon = new ImageIcon(f.getPath());
+                ImageIcon icon;
+                try {
+                    if (isGifImage(f)) {
+                        ArrayList<ImageIcon> frames = readGifFrames(f);
+                        icon = frames.get(0);
+                    } else {
+                        icon = new ImageIcon(f.getPath());
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 originalIcons.add(icon);
                 int originalWidth = icon.getIconWidth();
                 int originalHeight = icon.getIconHeight();
@@ -79,9 +135,11 @@ public class ImageDisplay {
                 int maxWidth = 100;
                 int maxHeight = 100;
 
-                // 计算缩放后的宽度和高度，保持纵横比不变
                 int scaledWidth;
                 int scaledHeight;
+
+                // 计算缩放后的宽度和高度，保持纵横比不变
+
                 if (originalWidth > originalHeight) {
                     scaledWidth = maxWidth;
                     scaledHeight = (int) (originalHeight * ((double) maxWidth / originalWidth));
@@ -98,6 +156,7 @@ public class ImageDisplay {
                 JLabel label = new JLabel(icon);
                 // 设置label的大小
                 label.setPreferredSize(new Dimension(maxWidth, maxHeight));
+                label.setOpaque(true);
                 smallLabels.add(label);
                 // 避免文件名过长导致图片变形
                 String fileName = f.getName();
@@ -108,9 +167,8 @@ public class ImageDisplay {
                 // 取消文本框的边框，设置为不可编辑，居中对齐
                 textField.setBorder(null);
                 textField.setEditable(false);
-                textField.setHorizontalAlignment(JTextField.LEFT);
+                textField.setHorizontalAlignment(SwingConstants.CENTER);
                 JPanel panel = new JPanel();
-                // 设定panel为箱式布局，让textField和label垂直排列
                 panel.setLayout(new BorderLayout());
                 panel.add(label, BorderLayout.CENTER);
                 panel.add(textField, BorderLayout.PAGE_END);
@@ -191,19 +249,6 @@ public class ImageDisplay {
         imagePanel.revalidate();
         imagePanel.repaint();
     }
-    // 删除图片,并更新面板
-
-
-    public void refreshImages() {
-        // 清除当前显示的所有图片
-        File directory = new File(currentDirectory);
-        File[] files = directory.listFiles(file -> file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")
-                || file.getName().endsWith(".png") || file.getName().endsWith(".gif")
-                || file.getName().endsWith(".bmp"));
-        addImageOnPane(files, directory.getName());
-
-    }
-
     public JScrollPane getScrollPane() {
         return scrollPane;
     }
@@ -222,10 +267,6 @@ public class ImageDisplay {
     }
     public String getCurrentDirectory() {
         return currentDirectory;
-    }
-
-    public ArrayList<JLabel> getSmallLabels() {
-        return smallLabels;
     }
 
     public ArrayList<ImageIcon> getOriginalIcons() {
