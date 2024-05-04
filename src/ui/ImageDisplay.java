@@ -117,17 +117,20 @@ public class ImageDisplay {
                     || f.getName().endsWith(".bmp")) {
                 totalSize += f.length();
                 ImageIcon icon;
+                ImageIcon icon1;
                 try {
                     if (isGifImage(f)) {
                         ArrayList<ImageIcon> frames = readGifFrames(f);
                         icon = frames.get(0);
+                        icon1 = new ImageIcon(f.getPath());
                     } else {
                         icon = new ImageIcon(f.getPath());
+                        icon1 = icon;
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                originalIcons.add(icon);
+                originalIcons.add(icon1);
                 int originalWidth = icon.getIconWidth();
                 int originalHeight = icon.getIconHeight();
 
