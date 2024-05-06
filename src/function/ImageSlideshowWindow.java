@@ -33,11 +33,16 @@ public class ImageSlideshowWindow extends JFrame {
     }
 
     public JToolBar initToolBar() {
-        JButton previousButton = new JButton("<--");
-        JButton nextButton = new JButton("-->");
-        JButton zoomInButton = new JButton("放大");
-        JButton zoomOutButton = new JButton("缩小");
-        JButton autoPlayButton = new JButton("自动播放");
+        JButton previousButton = new JButton("\ue72b");
+        previousButton.setFont(new Font("Segoe MDL2 Assets", Font.PLAIN, 24));
+        JButton nextButton = new JButton("\ue72a");
+        nextButton.setFont(new Font("Segoe MDL2 Assets", Font.PLAIN, 24));
+        JButton zoomInButton = new JButton("\ue71e");
+        zoomInButton.setFont(new Font("Segoe MDL2 Assets", Font.PLAIN, 24));
+        JButton zoomOutButton = new JButton("\ue71f");
+        zoomOutButton.setFont(new Font("Segoe MDL2 Assets", Font.PLAIN, 24));
+        JButton autoPlayButton = new JButton("\ue768");
+        autoPlayButton.setFont(new Font("Segoe MDL2 Assets", Font.PLAIN, 24));
         JToolBar toolB = new JToolBar();
         previousButton.addActionListener(new ActionListener() {
             @Override
@@ -80,11 +85,11 @@ public class ImageSlideshowWindow extends JFrame {
         autoPlayButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if ("自动播放".equals(autoPlayButton.getText())) {
-                    autoPlayButton.setText("  ||  ");
+                if ("\ue768".equals(autoPlayButton.getText())) {
+                    autoPlayButton.setText("\ue769");
                     autoPlay();
                 } else {
-                    autoPlayButton.setText("自动播放");
+                    autoPlayButton.setText("\ue768");
                     stopAutoPlay();
                 }
             }
