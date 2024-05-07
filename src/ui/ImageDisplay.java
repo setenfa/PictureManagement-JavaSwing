@@ -38,7 +38,7 @@ public class ImageDisplay {
         infoPanel.add(infoLabel);
         this.bottomPane = new BottomPane();
         imagePanel = new JPanel();
-        imagePanel.setLayout(new CustomFlowLayout(5));
+        imagePanel.setLayout(new CustomFlowLayout());
         // 用于放大或缩小imagePanel刷新组件的显示
         SwingUtilities.invokeLater(() -> {
             imagePanel.revalidate();
