@@ -3,22 +3,21 @@ package ui;
 import java.awt.*;
 
 public class CustomFlowLayout extends FlowLayout {
-    private int maxComponentsPerRow;
 
-    public CustomFlowLayout(int maxComponentsPerRow) {
-        this.maxComponentsPerRow = maxComponentsPerRow;
-    }
-
+    // 用途：
     @Override
     public Dimension preferredLayoutSize(Container target) {
         synchronized (target.getTreeLock()) {
-            int hgap = this.getHgap();
-            int vgap = this.getVgap();
+            int gap = this.getHgap();
+            int vga = this.getVgap();
             Insets insets = target.getInsets();
-            int maxwidth = target.getWidth() - (insets.left + insets.right + hgap * 2);
+            Rectangle bounds = target.getBounds();
+            int visibleWidth = bounds.width - (insets.left + insets.right + gap * 2);
+            int maxWidth = visibleWidth - (insets.left + insets.right + gap * 2);
+            System.out.println(visibleWidth);
             int nmembers = target.getComponentCount();
             int x = 0;
-            int y = insets.top + vgap;
+            int y = insets.top + vga;
             int rowh = 0;
             int start = 0;
 
@@ -28,53 +27,53 @@ public class CustomFlowLayout extends FlowLayout {
                     Dimension d = m.getPreferredSize();
                     m.setSize(d.width, d.height);
 
-                    if ((x == 0) || ((x + d.width) <= maxwidth)) {
+                    if ((x == 0) || ((x + d.width) <= maxWidth)) {
                         if (x > 0) {
-                            x += hgap;
+                            x += gap;
                         }
                         x += d.width;
                         rowh = Math.max(rowh, d.height);
                     } else {
                         x = d.width;
-                        y += vgap + rowh;
+                        y += vga + rowh;
                         rowh = d.height;
                     }
                 }
             }
-            return new Dimension(insets.left + insets.right + x + hgap * 2,
-                    insets.top + insets.bottom + y + rowh + vgap * 2);
+            return new Dimension(insets.left + insets.right + x + gap * 2,
+                    insets.top + insets.bottom + y + rowh + vga * 2);
         }
     }
     @Override
     public void layoutContainer(Container target) {
         synchronized (target.getTreeLock()) {
-            int hgap = this.getHgap();
-            int vgap = this.getVgap();
+            int gap = this.getHgap();
+            int vga = this.getVgap();
             Insets insets = target.getInsets();
-            int maxwidth = target.getWidth() - (insets.left + insets.right + hgap * 2);
-            int nmembers = target.getComponentCount();
-            int x = 0;
-            int y = insets.top + vgap;
+            int maxWidth = target.getWidth() - (insets.left + insets.right + gap * 2);
+            int nMembers = target.getComponentCount();
+            int x = insets.left + gap;
+            int y = insets.top + vga;
             int rowh = 0;
-            int start = 0;
 
-            for (int i = 0; i < nmembers; i++) {
+            for (int i = 0; i < nMembers; i++) {
                 Component m = target.getComponent(i);
                 if (m.isVisible()) {
                     Dimension d = m.getPreferredSize();
 
-                    if ((x == 0) || ((x + d.width) > maxwidth)) {
-                        if (i > 0) {
-                            y += vgap + rowh;
-                        }
-                        x = insets.left;
+                    // Check if the new bounds would exceed the container's bounds
+                    if ((x + d.width) <= maxWidth) {
+                        m.setBounds(x, y, d.width, d.height);
+                        x += d.width + gap;
+                        rowh = Math.max(rowh, d.height);
+                    } else {
+                        // If it would, start a new row
+                        x = insets.left + gap;
+                        y += vga + rowh;
                         rowh = d.height;
+                        m.setBounds(x, y, d.width, d.height);
+                        x += d.width + gap;
                     }
-
-                    m.setBounds(x, y, d.width, d.height);
-
-                    x += d.width + hgap;
-                    rowh = Math.max(rowh, d.height);
                 }
             }
         }
