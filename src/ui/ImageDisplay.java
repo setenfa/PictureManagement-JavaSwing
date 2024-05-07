@@ -5,6 +5,8 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public class ImageDisplay {
     private int selectedImages = 0;
     private final BottomPane bottomPane;
     private long totalSize = 0;
+    private static final int IMAGES_PER_PAGE = 20;
+    private int currentPage = 0;
     ArrayList<String> selectedImagePaths = new ArrayList<>();
     private String currentDirectory;
     private ImageSlideshowWindow slideshowWindow;
@@ -47,6 +51,20 @@ public class ImageDisplay {
         scrollPane = new JScrollPane(imagePanel);
         scrollPane.setPreferredSize(new Dimension(800, 600));
         scrollPane.setColumnHeaderView(infoPanel);
+        scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (e.getValueIsAdjusting()) {
+                    return;
+                }
+
+                JScrollBar scrollBar = (JScrollBar) e.getAdjustable();
+                int extent = scrollBar.getModel().getExtent();
+                if (e.getValue() + extent == scrollBar.getMaximum()) {
+                    loadNextPage();
+                }
+            }
+        });
     }
 
     private static boolean isGifImage(File file) throws IOException {
@@ -124,6 +142,7 @@ public class ImageDisplay {
                     throw new RuntimeException(e);
                 }
                 originalIcons.add(icon1);
+                numOfImages++;
                 int originalWidth = icon.getIconWidth();
                 int originalHeight = icon.getIconHeight();
 
@@ -233,17 +252,29 @@ public class ImageDisplay {
             }
         }
         // 将小面板添加到主面板，如果没有则显示没有图片
+        System.out.println(smallPanels.size() + "dd");
         if (!smallPanels.isEmpty()) {
-            for (JPanel smallPanel : smallPanels) {
-                imagePanel.add(smallPanel);
-                numOfImages++;
-            }
+            loadNextPage();
+        } else {
+            currentPage = 0;
         }
         infoLabel.setText("当前文件夹：" + folderName + "，图片数量：" + numOfImages);
         bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
         // 用于动态添加或删除组件后更新面板布局和刷新显示
         imagePanel.revalidate();
         imagePanel.repaint();
+    }
+
+    private void loadNextPage() {
+        int start = currentPage * IMAGES_PER_PAGE;
+        int end = Math.min(start + IMAGES_PER_PAGE, smallPanels.size());
+        for (int i = start; i < end; i++) {
+            imagePanel.add(smallPanels.get(i));
+        }
+        imagePanel.revalidate();
+        imagePanel.repaint();
+        currentPage++;
+        System.out.println(currentPage);
     }
     public JScrollPane getScrollPane() {
         return scrollPane;
