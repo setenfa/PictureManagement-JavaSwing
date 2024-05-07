@@ -25,7 +25,7 @@ public class ImageDisplay {
     // 记录当前面板中的图片数量
     private int numOfImages;
     private int selectedImages = 0;
-    private BottomPane bottomPane;
+    private final BottomPane bottomPane;
     private long totalSize = 0;
     ArrayList<String> selectedImagePaths = new ArrayList<>();
     private String currentDirectory;
@@ -40,11 +40,9 @@ public class ImageDisplay {
         imagePanel = new JPanel();
         imagePanel.setLayout(new CustomFlowLayout(5));
         // 用于放大或缩小imagePanel刷新组件的显示
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                imagePanel.revalidate();
-                imagePanel.repaint();
-            }
+        SwingUtilities.invokeLater(() -> {
+            imagePanel.revalidate();
+            imagePanel.repaint();
         });
         scrollPane = new JScrollPane(imagePanel);
         scrollPane.setPreferredSize(new Dimension(800, 600));
@@ -67,9 +65,7 @@ public class ImageDisplay {
     private static ArrayList<ImageIcon> readGifFrames(File file) throws IOException {
         ArrayList<ImageIcon> frames = new ArrayList<>();
         ImageReader reader = null;
-        ImageInputStream input = null;
-        try {
-            input = ImageIO.createImageInputStream(file);
+        try (ImageInputStream input = ImageIO.createImageInputStream(file)) {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
             if (readers.hasNext()) {
                 reader = readers.next();
@@ -83,9 +79,6 @@ public class ImageDisplay {
         } finally {
             if (reader != null) {
                 reader.dispose();
-            }
-            if (input != null) {
-                input.close();
             }
         }
         return frames;
