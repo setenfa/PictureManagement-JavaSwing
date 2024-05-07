@@ -5,15 +5,10 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import function.ImageMenuItem;
 import function.FileTreeCellRenderer;
 import function.TreeNodeEntity;
@@ -24,10 +19,8 @@ public class FilePane {
     private File currentFile;
     private ImageMenuItem imageMenuItem;
     // 创建一个线程池，用于遍历文件夹
-    private final ExecutorService executorService;
 
     public FilePane() {
-        this.executorService = Executors.newFixedThreadPool(2);
         imageDisplay = new ImageDisplay();
         imageMenuItem = new ImageMenuItem(imageDisplay);
         panel1 = new JPanel(new BorderLayout()); // 修改布局管理器为BorderLayout
@@ -62,25 +55,21 @@ public class FilePane {
         tree.addTreeWillExpandListener(new TreeWillExpandListener() {
             //节点将要展开时触发
             @Override
-            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+            public void treeWillExpand(TreeExpansionEvent event) {
                 //System.out.println("treeWillExpand");
                 DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode)event.getPath().getLastPathComponent();
                 defaultMutableTreeNode.removeAllChildren();
                 Object objTreeNodeEntity = defaultMutableTreeNode.getUserObject();
-                if(TreeNodeEntity.class.isInstance(objTreeNodeEntity)) {
+                if(objTreeNodeEntity instanceof TreeNodeEntity) {
                     TreeNodeEntity treeNodeEntity = (TreeNodeEntity)objTreeNodeEntity;
                     String path = treeNodeEntity.getPath();
                     addNodes(defaultMutableTreeNode, new File(path));
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            tree.updateUI();
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> tree.updateUI());
                 }
             }
             //节点将要关闭时触发
             @Override
-            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+            public void treeWillCollapse(TreeExpansionEvent event) {
             }
         });
         // 设置树的监听器，使其能够双击文件夹时显示文件夹中的图片
