@@ -14,14 +14,13 @@ public class CustomFlowLayout extends FlowLayout {
             Rectangle bounds = target.getBounds();
             int visibleWidth = bounds.width - (insets.left + insets.right + gap * 2);
             int maxWidth = visibleWidth - (insets.left + insets.right + gap * 2);
-            System.out.println(visibleWidth);
-            int nmembers = target.getComponentCount();
+            //System.out.println(visibleWidth);
+            int nMembers = target.getComponentCount();
             int x = 0;
             int y = insets.top + vga;
-            int rowh = 0;
-            int start = 0;
+            int rowMaxHeight = 0;
 
-            for (int i = 0; i < nmembers; i++) {
+            for (int i = 0; i < nMembers; i++) {
                 Component m = target.getComponent(i);
                 if (m.isVisible()) {
                     Dimension d = m.getPreferredSize();
@@ -32,16 +31,16 @@ public class CustomFlowLayout extends FlowLayout {
                             x += gap;
                         }
                         x += d.width;
-                        rowh = Math.max(rowh, d.height);
+                        rowMaxHeight = Math.max(rowMaxHeight, d.height);
                     } else {
                         x = d.width;
-                        y += vga + rowh;
-                        rowh = d.height;
+                        y += vga + rowMaxHeight;
+                        rowMaxHeight = d.height;
                     }
                 }
             }
             return new Dimension(insets.left + insets.right + x + gap * 2,
-                    insets.top + insets.bottom + y + rowh + vga * 2);
+                    insets.top + insets.bottom + y + rowMaxHeight + vga * 2);
         }
     }
     @Override
@@ -54,7 +53,7 @@ public class CustomFlowLayout extends FlowLayout {
             int nMembers = target.getComponentCount();
             int x = insets.left + gap;
             int y = insets.top + vga;
-            int rowh = 0;
+            int rowMaxHeight = 0;
 
             for (int i = 0; i < nMembers; i++) {
                 Component m = target.getComponent(i);
@@ -65,12 +64,12 @@ public class CustomFlowLayout extends FlowLayout {
                     if ((x + d.width) <= maxWidth) {
                         m.setBounds(x, y, d.width, d.height);
                         x += d.width + gap;
-                        rowh = Math.max(rowh, d.height);
+                        rowMaxHeight = Math.max(rowMaxHeight, d.height);
                     } else {
                         // If it would, start a new row
                         x = insets.left + gap;
-                        y += vga + rowh;
-                        rowh = d.height;
+                        y += vga + rowMaxHeight;
+                        rowMaxHeight = d.height;
                         m.setBounds(x, y, d.width, d.height);
                         x += d.width + gap;
                     }
