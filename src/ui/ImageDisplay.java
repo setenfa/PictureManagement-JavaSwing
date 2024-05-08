@@ -57,7 +57,6 @@ public class ImageDisplay {
                 if (e.getValueIsAdjusting()) {
                     return;
                 }
-
                 JScrollBar scrollBar = (JScrollBar) e.getAdjustable();
                 int extent = scrollBar.getModel().getExtent();
                 if (e.getValue() + extent == scrollBar.getMaximum()) {
@@ -252,7 +251,6 @@ public class ImageDisplay {
             }
         }
         // 将小面板添加到主面板，如果没有则显示没有图片
-        System.out.println(smallPanels.size() + "dd");
         if (!smallPanels.isEmpty()) {
             loadNextPage();
         } else {
@@ -274,7 +272,6 @@ public class ImageDisplay {
         imagePanel.revalidate();
         imagePanel.repaint();
         currentPage++;
-        System.out.println(currentPage);
     }
     public JScrollPane getScrollPane() {
         return scrollPane;
