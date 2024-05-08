@@ -4,9 +4,6 @@ import ui.ImageDisplay;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 
 public class ImageSlideshowWindow extends JFrame {
     private ImageDisplay imageDisplay;
@@ -44,54 +41,39 @@ public class ImageSlideshowWindow extends JFrame {
         JButton autoPlayButton = new JButton("\ue768");
         autoPlayButton.setFont(new Font("Segoe MDL2 Assets", Font.PLAIN, 24));
         JToolBar toolB = new JToolBar();
-        previousButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (index == 0) {
-                    JOptionPane.showMessageDialog(null, "已经是第一张图片了");
-                } else {
-                    index--;
-                    showImage();
-                }
+        previousButton.addActionListener(e -> {
+            if (index == 0) {
+                JOptionPane.showMessageDialog(null, "已经是第一张图片了");
+            } else {
+                index--;
+                showImage();
             }
         });
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (index == imageDisplay.getSmallPanels().size() - 1) {
-                    JOptionPane.showMessageDialog(null, "已经是最后一张图片了");
-                } else {
-                    index++;
-                    showImage();
-                }
+        nextButton.addActionListener(e -> {
+            if (index == imageDisplay.getSmallPanels().size() - 1) {
+                JOptionPane.showMessageDialog(null, "已经是最后一张图片了");
+            } else {
+                index++;
+                showImage();
             }
         });
-        zoomInButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ImageIcon originalIcon = (ImageIcon)imageLabel.getIcon();
-                ImageIcon zoomedIcon = zoomIn(originalIcon, 1.2);
-                imageLabel.setIcon(zoomedIcon);
-            }
+        zoomInButton.addActionListener(e -> {
+            ImageIcon originalIcon = (ImageIcon)imageLabel.getIcon();
+            ImageIcon zoomedIcon = zoomIn(originalIcon, 1.2);
+            imageLabel.setIcon(zoomedIcon);
         });
-        zoomOutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ImageIcon originalIcon = (ImageIcon)imageLabel.getIcon();
-                ImageIcon zoomedIcon = zoomOut(originalIcon, 1.2);
-                imageLabel.setIcon(zoomedIcon);
-            }
+        zoomOutButton.addActionListener(e -> {
+            ImageIcon originalIcon = (ImageIcon)imageLabel.getIcon();
+            ImageIcon zoomedIcon = zoomOut(originalIcon, 1.2);
+            imageLabel.setIcon(zoomedIcon);
         });
-        autoPlayButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if ("\ue768".equals(autoPlayButton.getText())) {
-                    autoPlayButton.setText("\ue769");
-                    autoPlay();
-                } else {
-                    autoPlayButton.setText("\ue768");
-                    stopAutoPlay();
-                }
+        autoPlayButton.addActionListener(e -> {
+            if ("\ue768".equals(autoPlayButton.getText())) {
+                autoPlayButton.setText("\ue769");
+                autoPlay();
+            } else {
+                autoPlayButton.setText("\ue768");
+                stopAutoPlay();
             }
         });
         toolB.add(previousButton);
@@ -131,21 +113,17 @@ public class ImageSlideshowWindow extends JFrame {
     }
 
     public ImageIcon zoomIn(ImageIcon imageIcon, double radio) {
-        BufferedImage image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics g = image.getGraphics();
-        imageIcon.paintIcon(null, g, 0, 0);
-        g.dispose();
-        BufferedImage resizedImage = ImageResizer.resize(image, radio);
-        return new ImageIcon(resizedImage);
+        Image originalImage = imageIcon.getImage();
+        Image scaledImage = originalImage.getScaledInstance((int)(originalImage.getWidth(null) * radio),
+                (int)(originalImage.getHeight(null) * radio), Image.SCALE_DEFAULT);
+        return new ImageIcon(scaledImage);
     }
 
     public ImageIcon zoomOut(ImageIcon imageIcon, double radio) {
-        BufferedImage image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics g = image.getGraphics();
-        imageIcon.paintIcon(null, g, 0, 0);
-        g.dispose();
-        BufferedImage resizedImage = ImageResizer.resize(image, 1 / radio);
-        return new ImageIcon(resizedImage);
+        Image originalImage = imageIcon.getImage();
+        Image scaledImage = originalImage.getScaledInstance((int)(originalImage.getWidth(null) / radio),
+                (int)(originalImage.getHeight(null) / radio), Image.SCALE_DEFAULT);
+        return new ImageIcon(scaledImage);
     }
 
     public void stopAutoPlay() {
