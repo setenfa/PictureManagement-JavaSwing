@@ -40,7 +40,7 @@ public class ImageDisplay {
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         infoPanel = new JPanel(new GridBagLayout());
         infoPanel.add(infoLabel);
-        this.bottomPane = new BottomPane();
+        this.bottomPane = new BottomPane(ImageDisplay.this);
         imagePanel = new JPanel();
         imagePanel.setLayout(new CustomFlowLayout());
         // 用于放大或缩小imagePanel刷新组件的显示
