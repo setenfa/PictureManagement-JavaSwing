@@ -1,7 +1,6 @@
 package function;
 
 import ui.ImageDisplay;
-
 import javax.swing.*;
 import java.awt.*;
 
