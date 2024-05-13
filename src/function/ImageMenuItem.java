@@ -153,7 +153,7 @@ public class ImageMenuItem {
                 counter++;
             }
             try {
-                imageDisplay.getOriginalIcons().add(new ImageIcon(dest.toString()));
+                imageDisplay.getOriginalIcons().add(new ImageIcon(src.toString()));
                 totalSize += Files.size(src);
                 for(JPanel panel : imageDisplay.getSmallPanels()) {
                     if (path.toString().equals(panel.getClientProperty("imagePath"))) {
