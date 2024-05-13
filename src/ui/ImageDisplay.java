@@ -15,6 +15,8 @@ import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
 import function.ImageSlideshowWindow;
+import util.ui.CustomFlowLayout;
+
 public class ImageDisplay {
     JPanel imagePanel;
     JScrollPane scrollPane;
@@ -76,6 +78,7 @@ public class ImageDisplay {
         File[] files = directory.listFiles(file -> file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")
                 || file.getName().endsWith(".png") || file.getName().endsWith(".gif")
                 || file.getName().endsWith(".bmp"));
+        currentPage = 0;
         addImageOnPane(files, directory.getName());
     }
 
