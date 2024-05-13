@@ -97,6 +97,7 @@ public class FilePane {
                             if (folderName.isEmpty()) {
                                 folderName = file.getPath();
                             }
+                            imageDisplay.setCurrentPage(0);
                             imageDisplay.addImageOnPane(files, folderName);
                             imageDisplay.getImagePanel().repaint();
                             currentFile = file;
