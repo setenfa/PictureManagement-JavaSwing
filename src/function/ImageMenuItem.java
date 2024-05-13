@@ -177,12 +177,12 @@ public class ImageMenuItem {
                 panel.setLayout(new BorderLayout());
                 panel.add(label2, BorderLayout.CENTER);
                 panel.add(textField, BorderLayout.PAGE_END);
-                Icon finalNewIcon = newIcon;
+                imageDisplay.getSmallPanels().add(panel);
                 panel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         if (e.getClickCount() == 2) {
-                            new ImageSlideshowWindow(imageDisplay.getOriginalIcons().indexOf(finalNewIcon), imageDisplay).showImage();
+                            new ImageSlideshowWindow(imageDisplay.getSmallPanels().indexOf(panel), imageDisplay).showImage();
                         } else if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON1) {
                             if (panel.getBorder() != null) {
                                 panel.setBorder(null);
@@ -209,7 +209,6 @@ public class ImageMenuItem {
                         }
                     }
                 });
-                imageDisplay.getSmallPanels().add(panel);
                 Files.copy(src, dest);
             } catch (IOException e) {
                 e.printStackTrace();
