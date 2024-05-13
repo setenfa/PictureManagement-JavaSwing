@@ -74,12 +74,16 @@ public class ImageDisplay {
 
     public void refreshImages() {
         // 清除当前显示的所有图片
-        File directory = new File(currentDirectory);
-        File[] files = directory.listFiles(file -> file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg")
-                || file.getName().endsWith(".png") || file.getName().endsWith(".gif")
-                || file.getName().endsWith(".bmp"));
+        imagePanel.removeAll();
         currentPage = 0;
-        addImageOnPane(files, directory.getName());
+        // 重新加载图片
+        if (!smallPanels.isEmpty()) {
+            loadNextPage();
+        }
+        File directory = new File(currentDirectory);
+        String folderName = directory.getName();
+        infoLabel.setText("当前文件夹：" + folderName + "，图片数量：" + numOfImages);
+        bottomPane.updateInfo(numOfImages, totalSize, selectedImages);
     }
 
     private static ArrayList<ImageIcon> readGifFrames(File file) throws IOException {
@@ -292,11 +296,35 @@ public class ImageDisplay {
     public ArrayList<JPanel> getSmallPanels() {
         return smallPanels;
     }
+    public int getNumOfImages() {
+        return numOfImages;
+    }
+    public void setNumOfImages(int numOfImages) {
+        this.numOfImages = numOfImages;
+    }
+    public long getTotalSize() {
+        return totalSize;
+    }
+    public void setTotalSize(long totalSize) {
+        this.totalSize = totalSize;
+    }
     public String getCurrentDirectory() {
         return currentDirectory;
     }
 
     public ArrayList<ImageIcon> getOriginalIcons() {
         return originalIcons;
+    }
+    public void setOriginalIcons(ArrayList<ImageIcon> originalIcons) {
+        this.originalIcons = originalIcons;
+    }
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+    public int getSelectedImages() {
+        return selectedImages;
+    }
+    public void setSelectedImages(int selectedImages) {
+        this.selectedImages = selectedImages;
     }
 }
