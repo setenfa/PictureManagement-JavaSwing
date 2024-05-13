@@ -115,12 +115,16 @@ public class ImageMenuItem {
     public void deleteImage(String imagePath){
         Path path = Paths.get(imagePath);
         try{
+            imageDisplay.setTotalSize(imageDisplay.getTotalSize() - Files.size(path));
             if (Files.exists(path)) {
                 Files.delete(path);
             }
+            imageDisplay.setNumOfImages(imageDisplay.getNumOfImages() - 1);
+            imageDisplay.getOriginalIcons().removeIf(icon -> imagePath.equals(icon.getDescription()));
             imageDisplay.getSmallPanels().removeIf(panel -> imagePath.equals(panel.getClientProperty("imagePath")));
             imageDisplay.getSelectedImagePaths().remove(imagePath);
             imageDisplay.refreshImages();
+            // System.out.println(imageDisplay.getOriginalIcons().size());
         } catch (IOException E){
             E.printStackTrace();
         }
@@ -128,6 +132,8 @@ public class ImageMenuItem {
 
     // 粘贴图片
     public void pasteImage(){
+        long totalSize = 0;
+        Icon newIcon = null;
         for (String path : copiedImagePaths) {
             Path src = Paths.get(path);
             String originalFileName = src.getFileName().toString();
@@ -147,11 +153,71 @@ public class ImageMenuItem {
                 counter++;
             }
             try {
+                imageDisplay.getOriginalIcons().add(new ImageIcon(dest.toString()));
+                totalSize += Files.size(src);
+                for(JPanel panel : imageDisplay.getSmallPanels()) {
+                    if (path.toString().equals(panel.getClientProperty("imagePath"))) {
+                        JLabel label = (JLabel) panel.getComponent(0);
+                        newIcon = label.getIcon();
+                        break;
+                    }
+                }
+                JLabel label2 = new JLabel();
+                label2.setIcon(newIcon);
+                label2.setPreferredSize(new Dimension(100, 100));
+                JPanel panel = new JPanel();
+                panel.putClientProperty("imagePath", dest.toString());
+                if (newFileName.length() > 10) {
+                    newFileName = newFileName.substring(0, 10) + "...";
+                }
+                JTextField textField = new JTextField(newFileName);
+                textField.setBorder(null);
+                textField.setEditable(false);
+                textField.setHorizontalAlignment(SwingConstants.CENTER);
+                panel.setLayout(new BorderLayout());
+                panel.add(label2, BorderLayout.CENTER);
+                panel.add(textField, BorderLayout.PAGE_END);
+                Icon finalNewIcon = newIcon;
+                panel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 2) {
+                            new ImageSlideshowWindow(imageDisplay.getOriginalIcons().indexOf(finalNewIcon), imageDisplay).showImage();
+                        } else if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON1) {
+                            if (panel.getBorder() != null) {
+                                panel.setBorder(null);
+                                imageDisplay.getSelectedImagePaths().remove(panel.getClientProperty("imagePath").toString());
+                                imageDisplay.setSelectedImages(imageDisplay.getSelectedImages() - 1);
+                                imageDisplay.getBottomPane().updateInfo(imageDisplay.getNumOfImages(), imageDisplay.getTotalSize(), imageDisplay.getSelectedImages());
+                            } else {
+                                panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                                imageDisplay.getSelectedImagePaths().add(panel.getClientProperty("imagePath").toString());
+                                imageDisplay.setSelectedImages(imageDisplay.getSelectedImages() + 1);
+                                imageDisplay.getBottomPane().updateInfo(imageDisplay.getNumOfImages(), imageDisplay.getTotalSize(), imageDisplay.getSelectedImages());
+                            }
+                        } else if (e.getButton() == MouseEvent.BUTTON1) {
+                            if (panel.getBorder() == null) {
+                                for (JPanel smallPanel : imageDisplay.getSmallPanels()) {
+                                    smallPanel.setBorder(null);
+                                }
+                                panel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                                imageDisplay.getSelectedImagePaths().clear();
+                                imageDisplay.getSelectedImagePaths().add(panel.getClientProperty("imagePath").toString());
+                                imageDisplay.setSelectedImages(1);
+                                imageDisplay.getBottomPane().updateInfo(imageDisplay.getNumOfImages(), imageDisplay.getTotalSize(), imageDisplay.getSelectedImages());
+                            }
+                        }
+                    }
+                });
+                imageDisplay.getSmallPanels().add(panel);
                 Files.copy(src, dest);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        imageDisplay.setTotalSize(imageDisplay.getTotalSize() + totalSize);
+        imageDisplay.setNumOfImages(imageDisplay.getNumOfImages() + copiedImagePaths.size());
+        imageDisplay.getBottomPane().updateInfo(imageDisplay.getNumOfImages(), imageDisplay.getTotalSize(), imageDisplay.getSelectedImagePaths().size());
         imageDisplay.refreshImages();
     }
 
@@ -176,6 +242,27 @@ public class ImageMenuItem {
             newName += "." + extension;
             Path newPath = oldPath.resolveSibling(newName);
             try {
+                //System.out.println(newPath);
+                //System.out.println(oldPath);
+                String oldPath1 = oldPath.toString();
+                for(JPanel panel : imageDisplay.getSmallPanels()) {
+                    //System.out.println(panel.getClientProperty("imagePath"));
+                    if (oldPath1.equals(panel.getClientProperty("imagePath"))) {
+                        //System.out.println(newName);
+                        panel.putClientProperty("imagePath", newPath.toString());
+                        JTextField textField = (JTextField) panel.getComponent(1);
+                        panel.remove(1);
+                        textField.setText(newName);
+                        if (newName.length() > 10) {
+                            textField.setText(newName.substring(0, 10) + "...");
+                        }
+                        textField.setBorder(null);
+                        textField.setEditable(false);
+                        textField.setHorizontalAlignment(SwingConstants.CENTER);
+                        panel.add(textField, BorderLayout.PAGE_END);
+                        break;
+                    }
+                }
                 Files.move(oldPath, newPath);
                 int index = imageDisplay.getSelectedImagePaths().indexOf(path);
                 imageDisplay.getSelectedImagePaths().set(index, newPath.toString());
