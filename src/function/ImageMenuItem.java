@@ -47,6 +47,7 @@ public class ImageMenuItem {
         });
         pasteItem.addActionListener((ActionEvent e) ->{
             pasteImage();
+            copiedImagePaths.clear();
             JOptionPane.showMessageDialog(null, "粘贴成功");
         });
         renameItem.addActionListener((ActionEvent e) -> {
