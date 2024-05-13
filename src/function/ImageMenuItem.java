@@ -38,6 +38,7 @@ public class ImageMenuItem {
                     deleteImage(path);
                 }
             }
+            JOptionPane.showMessageDialog(null, "删除成功");
         });
         copyItem.addActionListener((ActionEvent e) -> {
             copiedImagePaths.clear();
