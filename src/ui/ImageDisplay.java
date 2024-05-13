@@ -118,6 +118,7 @@ public class ImageDisplay {
         smallTextFields.clear();
         smallPanels.clear();
         imagePanel.removeAll();
+        originalIcons.clear();
         if (files == null) {
             return;
         }
