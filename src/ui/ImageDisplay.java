@@ -126,8 +126,6 @@ public class ImageDisplay {
         if (files.length == 0) {
             infoLabel.setText("当前文件夹：" + folderName + "，图片数量：" + numOfImages);
             return;
-        } else {
-            currentDirectory = files[0].getParent();
         }
         for (File f : files) {
             if (f.getName().endsWith(".jpg") || f.getName().endsWith(".jpeg")
@@ -311,6 +309,10 @@ public class ImageDisplay {
     }
     public String getCurrentDirectory() {
         return currentDirectory;
+    }
+
+    public void setCurrentDirectory(String currentDirectory) {
+        this.currentDirectory = currentDirectory;
     }
 
     public ArrayList<ImageIcon> getOriginalIcons() {
