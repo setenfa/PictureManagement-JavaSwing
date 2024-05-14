@@ -114,6 +114,7 @@ public class ImageDisplay {
         selectedImages = 0;
         totalSize = 0;
 
+        selectedImagePaths.clear();
         smallLabels.clear();
         smallTextFields.clear();
         smallPanels.clear();
