@@ -101,6 +101,7 @@ public class FilePane {
                             imageDisplay.addImageOnPane(files, folderName);
                             imageDisplay.getImagePanel().repaint();
                             currentFile = file;
+                            imageDisplay.setCurrentDirectory(file.toString());
                         }
                     }
                     // 添加事件转发
