@@ -17,8 +17,10 @@ public class ImageMenuItem {
     private ImageDisplay imageDisplay;
     private JPopupMenu popupMenu;
     private List<String> copiedImagePaths;
+    private List<Icon> copiedIcons;
     public ImageMenuItem(ImageDisplay imageDisplay) {
         this.copiedImagePaths = new ArrayList<>();
+        this.copiedIcons = new ArrayList<>();
         this.imageDisplay = imageDisplay;
         this.popupMenu = createPopupMenu();
     }
@@ -43,6 +45,14 @@ public class ImageMenuItem {
         copyItem.addActionListener((ActionEvent e) -> {
             copiedImagePaths.clear();
             copiedImagePaths.addAll(imageDisplay.getSelectedImagePaths());
+            for(String path : copiedImagePaths) {
+                for(JPanel panel : imageDisplay.getSmallPanels()) {
+                    if (path.equals(panel.getClientProperty("imagePath"))) {
+                        copiedIcons.add(((JLabel)panel.getComponent(0)).getIcon());
+                        break;
+                    }
+                }
+            }
             JOptionPane.showMessageDialog(null, "复制成功");
         });
         pasteItem.addActionListener((ActionEvent e) ->{
@@ -138,6 +148,7 @@ public class ImageMenuItem {
             Path src = Paths.get(path);
             String originalFileName = src.getFileName().toString();
             String newFileName = originalFileName;
+            //System.out.println(imageDisplay.getCurrentDirectory());
             Path dest = Paths.get(imageDisplay.getCurrentDirectory() + "/" + newFileName);
             int counter = 1;
             while (Files.exists(dest)) {
@@ -153,17 +164,11 @@ public class ImageMenuItem {
                 counter++;
             }
             try {
-                imageDisplay.getOriginalIcons().add(new ImageIcon(src.toString()));
+                Files.copy(src, dest);
+                imageDisplay.getOriginalIcons().add(new ImageIcon(dest.toString()));
                 totalSize += Files.size(src);
-                for(JPanel panel : imageDisplay.getSmallPanels()) {
-                    if (path.toString().equals(panel.getClientProperty("imagePath"))) {
-                        JLabel label = (JLabel) panel.getComponent(0);
-                        newIcon = label.getIcon();
-                        break;
-                    }
-                }
                 JLabel label2 = new JLabel();
-                label2.setIcon(newIcon);
+                label2.setIcon(copiedIcons.get(copiedImagePaths.indexOf(path)));
                 label2.setPreferredSize(new Dimension(100, 100));
                 JPanel panel = new JPanel();
                 panel.putClientProperty("imagePath", dest.toString());
@@ -209,7 +214,6 @@ public class ImageMenuItem {
                         }
                     }
                 });
-                Files.copy(src, dest);
             } catch (IOException e) {
                 e.printStackTrace();
             }
