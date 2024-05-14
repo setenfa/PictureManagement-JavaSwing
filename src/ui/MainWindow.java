@@ -55,7 +55,7 @@ public class MainWindow {
     // 初始化路径栏
     private void initialPathBar(int width) {
         this.pathBar = new JPanel();
-        this.pathBar.setSize(width, 50);
+        this.pathBar.setSize(width, 32);
         this.pathBar.setBackground(Color.WHITE);
         this.pathBar.setLayout(null);
         JTextField path = new JTextField(fileNode.getCurrentFile().getPath());

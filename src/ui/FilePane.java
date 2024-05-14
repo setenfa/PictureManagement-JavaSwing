@@ -12,6 +12,7 @@ import java.io.File;
 import function.ImageMenuItem;
 import function.FileTreeCellRenderer;
 import function.TreeNodeEntity;
+
 public class FilePane {
     public JPanel panel1;
     private JTree tree;
@@ -53,21 +54,23 @@ public class FilePane {
         tree.setCellRenderer(new FileTreeCellRenderer());
         // 设置树的监听器，使其能够展开节点时加载子节点
         tree.addTreeWillExpandListener(new TreeWillExpandListener() {
-            //节点将要展开时触发
+            // 节点将要展开时触发
             @Override
             public void treeWillExpand(TreeExpansionEvent event) {
-                //System.out.println("treeWillExpand");
-                DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode)event.getPath().getLastPathComponent();
+                // System.out.println("treeWillExpand");
+                DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode) event.getPath()
+                        .getLastPathComponent();
                 defaultMutableTreeNode.removeAllChildren();
                 Object objTreeNodeEntity = defaultMutableTreeNode.getUserObject();
-                if(objTreeNodeEntity instanceof TreeNodeEntity) {
-                    TreeNodeEntity treeNodeEntity = (TreeNodeEntity)objTreeNodeEntity;
+                if (objTreeNodeEntity instanceof TreeNodeEntity) {
+                    TreeNodeEntity treeNodeEntity = (TreeNodeEntity) objTreeNodeEntity;
                     String path = treeNodeEntity.getPath();
                     addNodes(defaultMutableTreeNode, new File(path));
                     SwingUtilities.invokeLater(() -> tree.updateUI());
                 }
             }
-            //节点将要关闭时触发
+
+            // 节点将要关闭时触发
             @Override
             public void treeWillCollapse(TreeExpansionEvent event) {
             }
@@ -82,7 +85,7 @@ public class FilePane {
                         return;
                     }
                     Object userObject = node.getUserObject();
-                    //System.out.println(userObject.getClass());
+                    // System.out.println(userObject.getClass());
                     if (userObject instanceof TreeNodeEntity) {
                         TreeNodeEntity treeNodeEntity = (TreeNodeEntity) userObject;
                         File file = new File(treeNodeEntity.getPath());

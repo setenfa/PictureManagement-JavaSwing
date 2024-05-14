@@ -53,6 +53,7 @@ public class ImageDisplay {
         scrollPane = new JScrollPane(imagePanel);
         scrollPane.setPreferredSize(new Dimension(800, 600));
         scrollPane.setColumnHeaderView(infoPanel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
@@ -123,7 +124,7 @@ public class ImageDisplay {
         if (files == null) {
             return;
         }
-        //folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
+        // folderNameLabel.setText("当前文件夹：" + files[0].getParentFile().getName());
         if (files.length == 0) {
             infoLabel.setText("当前文件夹：" + folderName + "，图片数量：" + numOfImages);
             return;
@@ -244,7 +245,7 @@ public class ImageDisplay {
                     public void mouseClicked(MouseEvent e) {
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             // 当用户点击imagePanel时，取消所有面板的选中状态
-                            for(JPanel smallPanel : smallPanels) {
+                            for (JPanel smallPanel : smallPanels) {
                                 smallPanel.setBorder(null);
                             }
                             selectedImages = 0;
@@ -280,6 +281,7 @@ public class ImageDisplay {
         imagePanel.repaint();
         currentPage++;
     }
+
     public JScrollPane getScrollPane() {
         return scrollPane;
     }
@@ -287,27 +289,35 @@ public class ImageDisplay {
     public BottomPane getBottomPane() {
         return bottomPane;
     }
+
     public ArrayList<String> getSelectedImagePaths() {
         return selectedImagePaths;
     }
+
     public JPanel getImagePanel() {
         return imagePanel;
     }
+
     public ArrayList<JPanel> getSmallPanels() {
         return smallPanels;
     }
+
     public int getNumOfImages() {
         return numOfImages;
     }
+
     public void setNumOfImages(int numOfImages) {
         this.numOfImages = numOfImages;
     }
+
     public long getTotalSize() {
         return totalSize;
     }
+
     public void setTotalSize(long totalSize) {
         this.totalSize = totalSize;
     }
+
     public String getCurrentDirectory() {
         return currentDirectory;
     }
@@ -319,15 +329,19 @@ public class ImageDisplay {
     public ArrayList<ImageIcon> getOriginalIcons() {
         return originalIcons;
     }
+
     public void setOriginalIcons(ArrayList<ImageIcon> originalIcons) {
         this.originalIcons = originalIcons;
     }
+
     public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
     }
+
     public int getSelectedImages() {
         return selectedImages;
     }
+
     public void setSelectedImages(int selectedImages) {
         this.selectedImages = selectedImages;
     }
